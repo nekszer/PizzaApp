@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PizzaApp.MVVM.Views.PizzaPage"
+             NavigationPage.HasNavigationBar="False"
+             x:Name="Page">
+
+    <ContentPage.Resources>
+        <Style TargetType="Frame" x:Key="ToppingFrame">
+            <Setter Property="BorderColor" Value="Transparent" />
+            <Setter Property="HeightRequest" Value="60" />
+            <Setter Property="WidthRequest" Value="60" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light='#99FFD285'}" />
+            <Setter Property="CornerRadius" Value="30" />
+        </Style>
+
+        <Style TargetType="Button" x:Key="BtnPizzaSize">
+            <Setter Property="WidthRequest" Value="44" />
+            <Setter Property="HeightRequest" Value="44" />
+            <Setter Property="CornerRadius" Value="22" />
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="TextColor" Value="Black" />
+        </Style>
+    </ContentPage.Resources>
+    
+    <Grid Padding="15" RowDefinitions="Auto, *, 40" RowSpacing="6">
+        <Grid Grid.Row="0">
+            <Label Text="Arma tu Pizza" FontSize="Title" HorizontalTextAlignment="Center" />
+        </Grid>
+        <Frame Grid.Row="1" BorderColor="Transparent">
+            <StackLayout Spacing="16" VerticalOptions="Center">
+                <Grid x:Name="GridImages" WidthRequest="300" HeightRequest="300">
+                    <Image Source="tabla.png" HeightRequest="{Binding CurrentPizaSelected.Height}" WidthRequest="{Binding HeightRequest, Source={x:Reference PizzaImage}}" x:Name="TableImage" />
+                    <Image Source="pizza.png" HeightRequest="{Binding CurrentPizaSelected.Height}" WidthRequest="{Binding HeightRequest, Source={x:Reference PizzaImage}}" x:Name="PizzaImage" />
+                </Grid>
+                <StackLayout VerticalOptions="End" HorizontalOptions="Center" WidthRequest="{Binding CurrentPizaSelected.Height}"
+                             Padding="6,0" Spacing="6">
+                    <BoxView Color="Black" HeightRequest="1" VerticalOptions="End" />
+                    <Label Text="{Binding CurrentPizaSelected.Centimeters, StringFormat='{0} cm'}" HorizontalTextAlignment="Center"/>
+                </StackLayout>
+                <Label Text="{Binding TotalPrice, StringFormat='$ {0}'}" HorizontalTextAlignment="Center" FontSize="Title" FontAttributes="Bold" />
+                <StackLayout HorizontalOptions="Center" BindableLayout.ItemsSource="{Binding PizzaSizes}" Orientation="Horizontal" Spacing="18">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Button Text="{Binding Initial}" Grid.Column="0" Style="{StaticResource BtnPizzaSize}"
+                                Command="{Binding BindingContext.SelectPizzaSizeCommand, Source={x:Reference Page}}" 
+                                CommandParameter="{Binding .}">
+                                <Button.Shadow>
+                                    <Shadow Radius="10" Brush="#cfcfcf" />
+                                </Button.Shadow>
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                        <Setter Property="TextColor" Value="White" />
+                                        <Setter Property="Shadow.Opacity" Value="0" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+
+                <Label Text="{Binding ToppingPrice, StringFormat='${0} cada complemento'}" HorizontalTextAlignment="Center" FontSize="Subtitle" />
+                <ScrollView Orientation="Horizontal">
+                    <StackLayout Orientation="Horizontal" Spacing="6"
+                                 BindableLayout.ItemsSource="{Binding Toppings}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Style="{StaticResource ToppingFrame}">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding BindingContext.ToppingSelectionCommand, Source={x:Reference Page}}"
+                                                              CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+                                    <Image Source="{Binding PickerImage}" Aspect="AspectFit" />
+                                    <Frame.Triggers>
+                                        <DataTrigger TargetType="Frame" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                        </DataTrigger>
+                                    </Frame.Triggers>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+        </Frame>
+        <Button Text="Agregar al carrito" Grid.Row="1" Grid.RowSpan="2" VerticalOptions="End" Margin="0, 25" HorizontalOptions="Center"
+                Command="{Binding BtnAddPizzaToBasket}"/>
+    </Grid>
+    
+</ContentPage>
